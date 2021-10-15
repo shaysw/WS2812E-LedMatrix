@@ -1,0 +1,2 @@
+rpi_ws281x
+git+https://github.com/shaysw/GameOfLifePython.git
