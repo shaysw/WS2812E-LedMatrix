@@ -8,19 +8,22 @@ import itertools
 import time
 from rpi_ws281x import PixelStrip, Color
 import argparse
+from gpiozero import LED, Button
+import RPi.GPIO as GPIO
 
 # LED strip configuration:
 from GameOfLifePython.Grid import Grid
 
-LED_COUNT = 256        # Number of LED pixels.
-LED_PIN = 18          # GPIO pin connected to the pixels (18 uses PWM!).
+LED_COUNT = 256  # Number of LED pixels.
+LED_PIN = 18  # GPIO pin connected to the pixels (18 uses PWM!).
 # LED_PIN = 10        # GPIO pin connected to the pixels (10 uses SPI /dev/spidev0.0).
 LED_FREQ_HZ = 800000  # LED signal frequency in hertz (usually 800khz)
-LED_DMA = 10          # DMA channel to use for generating signal (try 10)
+LED_DMA = 10  # DMA channel to use for generating signal (try 10)
 LED_BRIGHTNESS = 5  # Set to 0 for darkest and 255 for brightest
-LED_INVERT = False    # True to invert the signal (when using NPN transistor level shift)
-LED_CHANNEL = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
+LED_INVERT = False  # True to invert the signal (when using NPN transistor level shift)
+LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
 WAIT_MS = 10
+ITERATION_INTERVAL_MS = 100
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=WAIT_MS):
@@ -28,7 +31,7 @@ def colorWipe(strip, color, wait_ms=WAIT_MS):
     for i in range(strip.numPixels()):
         strip.setPixelColor(i, color)
     strip.show()
-        #time.sleep(wait_ms / 1000.0)
+    # time.sleep(wait_ms / 1000.0)
 
 
 def theaterChase(strip, color, wait_ms=WAIT_MS, iterations=10):
@@ -54,6 +57,7 @@ def wheel(pos):
         pos -= 170
         return Color(0, pos * 3, 255 - pos * 3)
 
+
 def rainbow_cells(strip, cells, wait_ms=WAIT_MS, iterations=1):
     """Draw rainbow that fades across all pixels at once."""
     a = list(map(lambda cell: LedGrid.convert_array_cell_to_strip_cell(cell[0], cell[1]), cells))
@@ -62,6 +66,7 @@ def rainbow_cells(strip, cells, wait_ms=WAIT_MS, iterations=1):
             strip.setPixelColor(i, wheel((i + j) & 255))
         strip.show()
         time.sleep(wait_ms / 1000.0)
+
 
 def rainbow(strip, wait_ms=WAIT_MS, iterations=1):
     """Draw rainbow that fades across all pixels at once."""
@@ -100,7 +105,6 @@ class LedGrid(Grid):
         super().__init__()
         self.strip = strip
 
-
     def show(self):
         for row_index in range(len(self.grid)):
             for col_index in range(len(self.grid[row_index])):
@@ -118,9 +122,39 @@ class LedGrid(Grid):
         else:
             return row_index * 16 + col_index
 
+
+def start_game(strip):
+    time.sleep(0.5)
+    pause_game = False
+    
+    old_grid = LedGrid(strip)
+    old_grid.initialize()
+
+    old_grid.show()
+
+    while True:
+        if button.is_pressed:
+            pause_game = not pause_game
+
+        if pause_game:
+            time.sleep(0.1)
+            continue
+            
+        new_grid = LedGrid(strip)
+        new_grid.grid = old_grid.iterate_grid()
+        time.sleep(ITERATION_INTERVAL_MS / 1000)
+
+        if old_grid.grid == new_grid.grid:
+            print('game finished')
+            break
+
+        new_grid.show()
+
+        old_grid = new_grid
+
+
 if __name__ == '__main__':
-
-
+    game_started = False
 
     # Process arguments
     parser = argparse.ArgumentParser()
@@ -137,26 +171,11 @@ if __name__ == '__main__':
         print('Use "-c" argument to clear LEDs on exit')
 
     try:
-        old_grid = LedGrid(strip)
-        old_grid.initialize()
-
-        old_grid.show()
+        button = Button(2)
 
         while True:
-            # print('press any key to continue')
-            # input()
-            time.sleep(0.1)
-
-            new_grid = LedGrid(strip)
-            new_grid.grid = old_grid.iterate_grid()
-
-            if old_grid.grid == new_grid.grid:
-                print('game finished')
-                break
-
-            new_grid.show()
-
-            old_grid = new_grid
+            if button.is_pressed:
+                start_game(strip)
 
     finally:
         colorWipe(strip, Color(0, 0, 0), 10)
