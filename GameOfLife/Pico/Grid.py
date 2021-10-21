@@ -1,5 +1,8 @@
-import os
 from random import random
+
+HEIGHT = 16
+WIDTH = 16
+THRESHOLD = 0.33
 
 
 class Grid:
@@ -14,9 +17,9 @@ class Grid:
         return number_of_live_neighbours
 
     def __init__(self,
-                 height=16,
-                 width=16,
-                 threshold=0.33,
+                 height=HEIGHT,
+                 width=WIDTH,
+                 threshold=THRESHOLD,
                  live_slot_min_live_neighbours_to_keep_alive=2,
                  live_slot_max_live_neighbours_to_keep_alive=3,
                  dead_slot_min_live_neighbours_to_bring_to_life=3,
@@ -101,27 +104,3 @@ class Grid:
                 new_grid[row][col] = self.iterate_cell(row, col)
 
         return new_grid
-
-
-# if __name__ == '__main__':
-#     old_grid = Grid()
-#     old_grid.initialize()
-#
-#     _ = os.system('cls')
-#     print(old_grid)
-#
-#     while True:
-#         print('press any key to continue')
-#         input()
-#
-#         new_grid = Grid()
-#         new_grid.grid = old_grid.iterate_grid()
-#         _ = os.system('cls')
-#
-#         if old_grid.grid == new_grid.grid:
-#             print('game finished')
-#             break
-#
-#         print(new_grid)
-#
-#         old_grid = new_grid
