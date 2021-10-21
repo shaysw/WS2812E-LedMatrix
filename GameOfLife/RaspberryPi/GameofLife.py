@@ -122,24 +122,30 @@ class LedGrid(Grid):
         else:
             return row_index * 16 + col_index
 
+def pause_game():
+    button.wait_for_press()
 
-def start_game(strip):
+
+def start_game():
     time.sleep(0.5)
-    pause_game = False
-    
+
     old_grid = LedGrid(strip)
     old_grid.initialize()
 
     old_grid.show()
 
+    # button.when_pressed = pause_game
+    # button.when_held = reset_game
+
     while True:
         if button.is_pressed:
-            pause_game = not pause_game
+            time.sleep(0.5)
+            button.wait_for_press()
+        
+        if button.is_held:
+            reset_game()
+            break
 
-        if pause_game:
-            time.sleep(0.1)
-            continue
-            
         new_grid = LedGrid(strip)
         new_grid.grid = old_grid.iterate_grid()
         time.sleep(ITERATION_INTERVAL_MS / 1000)
@@ -151,6 +157,11 @@ def start_game(strip):
         new_grid.show()
 
         old_grid = new_grid
+
+
+def reset_game():
+    colorWipe(strip, Color(0, 0, 0), 10)
+    start_game()
 
 
 if __name__ == '__main__':
@@ -170,12 +181,12 @@ if __name__ == '__main__':
     if not args.clear:
         print('Use "-c" argument to clear LEDs on exit')
 
+    button = Button(2, hold_time=2)
+    
     try:
-        button = Button(2)
-
         while True:
-            if button.is_pressed:
-                start_game(strip)
-
+            button.wait_for_press()
+            start_game()
+        
     finally:
         colorWipe(strip, Color(0, 0, 0), 10)
