@@ -43,10 +43,10 @@ class Grid:
             # self.grid.append([random() < self.threshold for _ in range(self.width)])
 
     def get_neighbour(self, row, col):
-        if self.height <= row or row < 0 or self.width <= col or col < 0:
-            neighbour_value = False
-        else:
+        try:
             neighbour_value = self.grid[row][col]
+        except:
+            neighbour_value = False
 
         return neighbour_value
 
