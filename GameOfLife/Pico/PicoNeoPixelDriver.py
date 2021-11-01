@@ -3,9 +3,8 @@ from machine import Pin
 import rp2
 
 NUM_LEDS = 256
-PIN_NUM = 0
-BRIGHTNESS = 0.02
-
+PIN_NUM = 22 # Leave it as is, didn't work with GP0
+BRIGHTNESS = 0.1
 
 @rp2.asm_pio(sideset_init=rp2.PIO.OUT_LOW, out_shiftdir=rp2.PIO.SHIFT_LEFT, autopull=True, pull_thresh=24)
 def ws2812():
@@ -80,3 +79,14 @@ def colorWipe(color):
     for i in range(NUM_LEDS):
         pixels_set(i, color)
     pixels_show()
+
+
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+YELLOW = (255, 150, 0)
+GREEN = (0, 255, 0)
+CYAN = (0, 255, 255)
+BLUE = (0, 0, 255)
+PURPLE = (180, 0, 255)
+WHITE = (255, 255, 255)
+COLORS = (BLACK, RED, YELLOW, GREEN, CYAN, BLUE, PURPLE, WHITE)

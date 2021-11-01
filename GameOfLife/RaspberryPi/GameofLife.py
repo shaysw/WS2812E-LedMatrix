@@ -24,6 +24,7 @@ LED_INVERT = False  # True to invert the signal (when using NPN transistor level
 LED_CHANNEL = 0  # set to '1' for GPIOs 13, 19, 41, 45 or 53
 WAIT_MS = 10
 ITERATION_INTERVAL_MS = 100
+OPERATE_WITH_BUTTON = False
 
 # Define functions which animate LEDs in various ways.
 def colorWipe(strip, color, wait_ms=WAIT_MS):
@@ -122,10 +123,6 @@ class LedGrid(Grid):
         else:
             return row_index * 16 + col_index
 
-def pause_game():
-    button.wait_for_press()
-
-
 def start_game():
     time.sleep(0.5)
 
@@ -134,17 +131,15 @@ def start_game():
 
     old_grid.show()
 
-    # button.when_pressed = pause_game
-    # button.when_held = reset_game
-
     while True:
-        if button.is_pressed:
-            time.sleep(0.5)
-            button.wait_for_press()
-        
-        if button.is_held:
-            reset_game()
-            break
+        if OPERATE_WITH_BUTTON:
+            if button.is_pressed:
+                time.sleep(0.5)
+                button.wait_for_press()
+            
+            if button.is_held:
+                reset_game()
+                break
 
         new_grid = LedGrid(strip)
         new_grid.grid = old_grid.iterate_grid()
@@ -181,11 +176,13 @@ if __name__ == '__main__':
     if not args.clear:
         print('Use "-c" argument to clear LEDs on exit')
 
-    button = Button(2, hold_time=2)
+    if (OPERATE_WITH_BUTTON):
+        button = Button(2, hold_time=2)
     
     try:
         while True:
-            button.wait_for_press()
+            if (OPERATE_WITH_BUTTON):
+                button.wait_for_press()
             start_game()
         
     finally:

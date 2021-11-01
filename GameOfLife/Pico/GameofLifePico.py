@@ -2,10 +2,6 @@ GAME_OF_LIFE_FOLDER = 'GameOfLife'
 WAIT_MS = 10
 ITERATION_INTERVAL_MS = 100
 
-import os
-
-os.chdir(GAME_OF_LIFE_FOLDER)
-
 import time
 from Grid import Grid
 from PicoNeoPixelDriver import *
@@ -20,7 +16,6 @@ class LedGrid(Grid):
             for col_index in range(len(self.grid[row_index])):
                 strip_cell = self.convert_array_cell_to_strip_cell(row_index, col_index)
                 is_alive = self.grid[row_index][col_index]
-
                 pixels_set(strip_cell, (0, 255, 0) if is_alive else (0, 0, 0))
 
         pixels_show()
@@ -36,7 +31,7 @@ class LedGrid(Grid):
 def start_game():
     old_grid = LedGrid()
     old_grid.initialize()
-
+    print('initializing grid')
     old_grid.show()
 
     while True:
@@ -59,6 +54,7 @@ def reset_game():
 
 if __name__ == '__main__':
     try:
+        print('starting')
         while True:
             start_game()
 
