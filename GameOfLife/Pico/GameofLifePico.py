@@ -1,11 +1,12 @@
-GAME_OF_LIFE_FOLDER = 'GameOfLife'
-WAIT_MS = 10
-ITERATION_INTERVAL_MS = 100
 
 import time
 from Grid import Grid
 from PicoNeoPixelDriver import *
 
+WAIT_MS = 0
+ITERATION_INTERVAL_MS = 0
+BUTTON_PIN_NUMBER = 14
+OPERATE_WITH_BUTTON = True
 
 class LedGrid(Grid):
     def __init__(self):
@@ -31,13 +32,19 @@ class LedGrid(Grid):
 def start_game():
     old_grid = LedGrid()
     old_grid.initialize()
+
     print('initializing grid')
     old_grid.show()
-
+    
     while True:
+        if OPERATE_WITH_BUTTON and button.value():
+            print('restarting')
+            time.sleep(0.2)
+            break
+
         new_grid = LedGrid()
         new_grid.grid = old_grid.iterate_grid()
-        time.sleep(ITERATION_INTERVAL_MS / 1000)
+        # time.sleep(ITERATION_INTERVAL_MS / 1000)
 
         if old_grid.grid == new_grid.grid:
             print('game finished')
@@ -54,8 +61,16 @@ def reset_game():
 
 if __name__ == '__main__':
     try:
-        print('starting')
+        button = Pin(BUTTON_PIN_NUMBER, Pin.IN, Pin.PULL_DOWN)
+        
+        if OPERATE_WITH_BUTTON:
+            while True:
+                if button.value():
+                    break
+                else:
+                    time.sleep(0.2)
         while True:
+            print('starting')
             start_game()
 
     finally:

@@ -39,7 +39,6 @@ def pixels_show():
         b = int((c & 0xFF) * BRIGHTNESS)
         dimmer_ar[i] = (g << 16) + (r << 8) + b
     sm.put(dimmer_ar, 8)
-    time.sleep_ms(10)
 
 
 def pixels_set(i, color):

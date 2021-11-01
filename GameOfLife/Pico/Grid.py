@@ -40,15 +40,11 @@ class Grid:
         for row in range(self.height):
             self.grid[row] = [random() < self.threshold for _ in range(self.width)]
 
-            # self.grid.append([random() < self.threshold for _ in range(self.width)])
-
     def get_neighbour(self, row, col):
-        try:
-            neighbour_value = self.grid[row][col]
-        except:
-            neighbour_value = False
+        if row < 0 or row >= self.height or col < 0 or col >= self.width:
+            return False
 
-        return neighbour_value
+        return self.grid[row][col]
 
     def get_number_of_live_neighbours(self, row, col):
         number_of_live_neighbours = 0
