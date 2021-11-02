@@ -8,6 +8,8 @@ ITERATION_INTERVAL_MS = 0
 BUTTON_PIN_NUMBER = 14
 OPERATE_WITH_BUTTON = True
 
+button = Pin(BUTTON_PIN_NUMBER, Pin.IN, Pin.PULL_DOWN)
+
 class LedGrid(Grid):
     def __init__(self):
         super().__init__()
@@ -38,13 +40,11 @@ def start_game():
     
     while True:
         if OPERATE_WITH_BUTTON and button.value():
-            print('restarting')
-            time.sleep(0.2)
+            print('stopping')
             break
 
         new_grid = LedGrid()
         new_grid.grid = old_grid.iterate_grid()
-        # time.sleep(ITERATION_INTERVAL_MS / 1000)
 
         if old_grid.grid == new_grid.grid:
             print('game finished')
@@ -54,24 +54,23 @@ def start_game():
         old_grid = new_grid
 
 
-def reset_game():
-    colorWipe((0, 0, 0))
-    start_game()
-
-
-if __name__ == '__main__':
-    try:
-        button = Pin(BUTTON_PIN_NUMBER, Pin.IN, Pin.PULL_DOWN)
-        
-        if OPERATE_WITH_BUTTON:
-            while True:
-                if button.value():
-                    break
-                else:
-                    time.sleep(0.2)
+def run():
+    try:        
         while True:
-            print('starting')
-            start_game()
+            if OPERATE_WITH_BUTTON:
+                while True:
+                    if button.value():
+                        time.sleep(0.2)
+                        break
+
+                print('starting')
+                start_game()
+                colorWipe((0, 0, 0))
+                time.sleep(0.2)
 
     finally:
         colorWipe((0, 0, 0))
+
+if __name__ == '__main__':
+    run()
+    
